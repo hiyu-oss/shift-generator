@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>シフト作成</title>
+
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f5f5f7;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 600px;
+    margin: auto;
+}
+
+h1 {
+    text-align: center;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background: #007aff;
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+#result {
+    margin-top: 20px;
+    overflow-x: auto;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>📅 シフト作成</h1>
+
+<div class="card">
+
+<label>スタッフ人数</label>
+<input id="staffCount" type="number" value="10" min="1">
+
+<label>最大連勤</label>
+<input id="maxWork" type="number" value="3" min="1">
+
+<button onclick="createShift()">
+シフトを作成
+</button>
+
+</div>
+
+<div class="card" id="result">
+ここにシフトが表示されます。
+</div>
+
+</div>
+
+<script>
+
+function createShift() {
+
+    const staffCount =
+        Number(document.getElementById("staffCount").value);
+
+    const maxWork =
+        Number(document.getElementById("maxWork").value);
+
+    let html = "<h2>シフト表</h2>";
+
+    html += "<table border='1' cellpadding='8' style='border-collapse:collapse;width:100%'>";
+    
+    html += "<tr><th>スタッフ</th>";
+
+    for (let day = 1; day <= 7; day++) {
+        html += "<th>" + day + "</th>";
+    }
+
+    html += "</tr>";
+
+    for (let person = 1; person <= staffCount; person++) {
+
+        html += "<tr>";
+        html += "<td>スタッフ" + person + "</td>";
+
+        let consecutive = 0;
+
+        for (let day = 1; day <= 7; day++) {
+
+            let work;
+
+            if (consecutive >= maxWork) {
+                work = "休";
+                consecutive = 0;
+            } else {
+                work = Math.random() < 0.2 ? "休" : "HA";
+
+                if (work === "休") {
+                    consecutive = 0;
+                } else {
+                    consecutive++;
+                }
+            }
+
+            html += "<td>" + work + "</td>";
+        }
+
+        html += "</tr>";
+    }
+
+    html += "</table>";
+
+    document.getElementById("result").innerHTML = html;
+}
+
+</script>
+
+</body>
+</html>
