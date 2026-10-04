@@ -876,11 +876,19 @@ function validateRequests() {
 
       if (
         requests[s][d] === "有休"
-      ) paid++;
+      ) {
+
+        paid++;
+
+      }
 
       if (
         requests[s][d] === "休"
-      ) rest++;
+      ) {
+
+        rest++;
+
+      }
 
     }
 
@@ -930,11 +938,13 @@ function combinations(
   count
 ) {
 
-  if (count === 0)
+  if (count === 0) {
     return [[]];
+  }
 
-  if (array.length < count)
+  if (array.length < count) {
     return [];
+  }
 
   const result = [];
 
@@ -983,27 +993,44 @@ function combinations(
 }
 
 /* =========================================================
-   連勤可能性
+   月全体の勤務人数を計算
 ========================================================= */
 
-function canWork(
-  currentRun,
-  maxConsecutive
-) {
+function getWorkTarget() {
 
-  return (
-    currentRun <
-    maxConsecutive
-  );
+  const offTarget =
+    staff.map(
+      person =>
+        Number(person.publicHoliday || 0) +
+        Number(person.paidLeave || 0)
+    );
+
+  const totalPossible =
+    staff.length * days;
+
+  const totalOff =
+    offTarget.reduce(
+      (sum, value) =>
+        sum + value,
+      0
+    );
+
+  const totalWork =
+    totalPossible -
+    totalOff;
+
+  return {
+    offTarget,
+    totalWork
+  };
 
 }
 
 /* =========================================================
-   日ごとの目標勤務人数
-   ★今回の重要部分
+   1日の理想勤務人数
 ========================================================= */
 
-function createDailyWorkTargets(
+function createDailyTargets(
   totalWork
 ) {
 
@@ -1020,40 +1047,36 @@ function createDailyWorkTargets(
       .fill(base);
 
   /*
-    余った勤務人数を
-    月の中に均等に散らす。
+    例えば190人日 / 30日なら
 
-    例：
-    平均6.4人なら
+    6人の日 → 20日
+    7人の日 → 10日
 
-    6,6,7,6,6,7,6,7...
-
-    のように配置する。
+    のようにする。
   */
 
   for (
-    let d = 0;
-    d < days;
-    d++
+    let i = 0;
+    i < remainder;
+    i++
   ) {
 
-    const before =
+    /*
+      なるべく均等な間隔で
+      +1する日を配置
+    */
+
+    const day =
       Math.floor(
-        d * remainder / days
+        i * days / remainder
       );
 
-    const after =
-      Math.floor(
-        (d + 1) * remainder / days
-      );
-
-    if (
-      after > before
-    ) {
-
-      targets[d]++;
-
-    }
+    targets[
+      Math.min(
+        day,
+        days - 1
+      )
+    ]++;
 
   }
 
@@ -1062,16 +1085,94 @@ function createDailyWorkTargets(
 }
 
 /* =========================================================
-   その日の勤務候補を作る
+   今日の勤務人数候補
+========================================================= */
+
+function getWorkCountCandidates(
+  target,
+  minRequired,
+  maxAvailable
+) {
+
+  const set =
+    new Set();
+
+  /*
+    目標人数を最優先
+  */
+
+  [
+    target,
+    target - 1,
+    target + 1,
+    target - 2,
+    target + 2,
+    minRequired,
+    maxAvailable
+  ].forEach(count => {
+
+    if (
+      count >= minRequired &&
+      count <= maxAvailable
+    ) {
+
+      set.add(count);
+
+    }
+
+  });
+
+  return [...set]
+    .sort(
+      (a, b) =>
+        Math.abs(a - target) -
+        Math.abs(b - target)
+    );
+
+}
+
+/* =========================================================
+   未来に必要な休みを計算
+========================================================= */
+
+function futureFixedOffCount(
+  s,
+  startDay
+) {
+
+  let count = 0;
+
+  for (
+    let d = startDay;
+    d < days;
+    d++
+  ) {
+
+    if (
+      isFixedOff(s, d)
+    ) {
+
+      count++;
+
+    }
+
+  }
+
+  return count;
+
+}
+
+/* =========================================================
+   今日の勤務候補
 ========================================================= */
 
 function makeDailyCandidates(
   day,
-  previousShifts,
+  previousShift,
   run,
   offCount,
   offTarget,
-  targetWorkCount,
+  targetWork,
   maxConsecutive
 ) {
 
@@ -1089,34 +1190,34 @@ function makeDailyCandidates(
       ).value
     );
 
+  const minimum =
+    haNeed + hpNeed;
+
   const all =
     staff.map(
       (_, i) => i
     );
 
-  const remainingDays =
-    days - day;
+  const remainingAfterToday =
+    days - day - 1;
 
-  /*
-    今日必ず休まなければならない人
-  */
+  const mustWork =
+    new Set();
 
   const mustOff =
     new Set();
 
   /*
-    今日必ず勤務しなければならない人
+    各スタッフについて、
+    今日勤務必須 / 今日休み必須を決定
   */
-
-  const mustWork =
-    new Set();
 
   for (
     const s of all
   ) {
 
     /*
-      希望休・有休
+      希望休・有休は必ず休み
     */
 
     if (
@@ -1124,12 +1225,14 @@ function makeDailyCandidates(
     ) {
 
       mustOff.add(s);
+
       continue;
 
     }
 
     /*
-      最大連勤に到達している
+      最大連勤に達している場合は
+      今日休み必須
     */
 
     if (
@@ -1137,12 +1240,15 @@ function makeDailyCandidates(
     ) {
 
       mustOff.add(s);
+
       continue;
 
     }
 
     /*
-      すでに休みを使い切った
+      すでに必要な休みを
+      全部消化している
+      →これ以上休めない
     */
 
     if (
@@ -1150,23 +1256,24 @@ function makeDailyCandidates(
     ) {
 
       mustWork.add(s);
+
       continue;
 
     }
 
     /*
-      残り日数すべて休んでも
-      必要な休みを消化できない場合
-      → 今日勤務必須
+      今日休まないと、
+      残りの日数では必要な休みを
+      消化できなくなる場合
     */
 
-    const remainingOff =
+    const needOff =
       offTarget[s] -
       offCount[s];
 
     if (
-      remainingOff ===
-      remainingDays
+      needOff >
+      remainingAfterToday
     ) {
 
       mustOff.add(s);
@@ -1176,7 +1283,7 @@ function makeDailyCandidates(
   }
 
   /*
-    勤務と休みが矛盾している
+    矛盾チェック
   */
 
   for (
@@ -1193,21 +1300,14 @@ function makeDailyCandidates(
 
   }
 
-  /*
-    HP→翌日HA禁止のため、
-    前日HPの人はHA不可。
-    ただしHP勤務は可能。
-  */
-
   const available =
     all.filter(
-      s =>
-        !mustOff.has(s)
+      s => !mustOff.has(s)
     );
 
   if (
     available.length <
-    haNeed + hpNeed
+    minimum
   ) {
 
     return [];
@@ -1215,72 +1315,23 @@ function makeDailyCandidates(
   }
 
   /*
-    目標人数の前後を少し許容。
-    希望休などで完全均等が難しい場合に対応。
+    今日の勤務人数候補
   */
 
-  const minCount =
-    Math.max(
-      haNeed + hpNeed,
-      mustWork.size
+  const countCandidates =
+    getWorkCountCandidates(
+      targetWork,
+      Math.max(
+        minimum,
+        mustWork.size
+      ),
+      available.length
     );
-
-  const maxCount =
-    available.length;
-
-  const sizeCandidates = [];
-
-  /*
-    まず目標人数を優先
-  */
-
-  const offsets = [
-    0,
-    -1,
-    1,
-    -2,
-    2
-  ];
-
-  for (
-    const offset of offsets
-  ) {
-
-    const count =
-      targetWorkCount + offset;
-
-    if (
-      count >= minCount &&
-      count <= maxCount &&
-      !sizeCandidates.includes(count)
-    ) {
-
-      sizeCandidates.push(count);
-
-    }
-
-  }
-
-  /*
-    目標人数そのものが無理なら
-    最低人数を候補にする
-  */
-
-  if (
-    sizeCandidates.length === 0 &&
-    minCount <= maxCount
-  ) {
-
-    sizeCandidates.push(
-      minCount
-    );
-
-  }
 
   const candidates = [];
 
   for (
-    const workCount of sizeCandidates
+    const workCount of countCandidates
   ) {
 
     const flexible =
@@ -1288,47 +1339,72 @@ function makeDailyCandidates(
         s => !mustWork.has(s)
       );
 
-    const needFlexible =
+    const need =
       workCount -
       mustWork.size;
 
     if (
-      needFlexible < 0 ||
-      needFlexible > flexible.length
+      need < 0 ||
+      need > flexible.length
     ) {
 
       continue;
 
     }
 
-    const workSets =
+    let workSets =
       combinations(
         flexible,
-        needFlexible
+        need
       );
 
+    /*
+      組み合わせが大量になる場合は
+      ランダム性を持たせて上限を設ける。
+    */
+
+    if (
+      workSets.length > 180
+    ) {
+
+      workSets =
+        shuffle(workSets)
+          .slice(0, 180);
+
+    }
+
     for (
-      const extraWork of workSets
+      const extra of workSets
     ) {
 
       const working =
         [
           ...mustWork,
-          ...extraWork
+          ...extra
         ];
 
-      /*
-        勤務者が全員level1ならNG
-      */
+      const workingSet =
+        new Set(working);
 
-      const hasLevel2 =
-        working.some(
-          s => staff[s].level === 2
-        );
+      /*
+        レベル1がいる場合、
+        レベル2が最低1人必要
+      */
 
       const hasLevel1 =
         working.some(
-          s => staff[s].level === 1
+          s =>
+            Number(
+              staff[s].level
+            ) === 1
+        );
+
+      const hasLevel2 =
+        working.some(
+          s =>
+            Number(
+              staff[s].level
+            ) === 2
         );
 
       if (
@@ -1341,28 +1417,27 @@ function makeDailyCandidates(
       }
 
       /*
-        今日休ませる人数
+        今日休む人について、
+        月末までの休日日数が成立するか確認
       */
 
-      const workingSet =
-        new Set(working);
-
-      let valid = true;
+      let valid =
+        true;
 
       for (
         const s of all
       ) {
 
-        if (
-          workingSet.has(s)
-        ) {
-
-          continue;
-
-        }
+        const willWork =
+          workingSet.has(s);
 
         const newOff =
-          offCount[s] + 1;
+          offCount[s] +
+          (
+            willWork
+              ? 0
+              : 1
+          );
 
         if (
           newOff >
@@ -1374,15 +1449,36 @@ function makeDailyCandidates(
 
         }
 
-        const futureDays =
-          days - day - 1;
-
-        const futureOff =
-          offTarget[s] - newOff;
+        const needFutureOff =
+          offTarget[s] -
+          newOff;
 
         if (
-          futureOff < 0 ||
-          futureOff > futureDays
+          needFutureOff <
+          0 ||
+          needFutureOff >
+          remainingAfterToday
+        ) {
+
+          valid = false;
+          break;
+
+        }
+
+        /*
+          未来の固定休が、
+          必要な休み数を超えていないか
+        */
+
+        const fixedFuture =
+          futureFixedOffCount(
+            s,
+            day + 1
+          );
+
+        if (
+          fixedFuture >
+          needFutureOff
         ) {
 
           valid = false;
@@ -1396,78 +1492,48 @@ function makeDailyCandidates(
         continue;
 
       /*
-        シフトを決定
+        HA / HPを割り振る
       */
 
-      const shiftCandidates =
+      const shifts =
         makeShiftCandidates(
           working,
           day,
-          previousShifts,
+          previousShift,
           haNeed,
           hpNeed
         );
 
       for (
-        const shift of shiftCandidates
+        const shift of shifts
       ) {
 
         let score =
           shift.score;
 
         /*
-          目標人数から離れるほど減点
+          目標人数に近いほど高評価
         */
 
         score -=
           Math.abs(
             workCount -
-            targetWorkCount
-          ) * 150;
+            targetWork
+          ) * 500;
 
         /*
-          今日勤務してほしい人を
-          勤務させることに少し加点
+          追加勤務はOK。
+          ただし最低人数から大きく離れるほど
+          少しずつ減点。
         */
-
-        for (
-          const s of working
-        ) {
-
-          if (
-            offCount[s] < offTarget[s]
-          ) {
-
-            const remainingOff =
-              offTarget[s] -
-              offCount[s];
-
-            const remainingDaysAfter =
-              days - day - 1;
-
-            /*
-              休みをまだ多く残している人は
-              無理に勤務させない
-            */
-
-            if (
-              remainingOff <
-              remainingDaysAfter
-            ) {
-
-              score += 2;
-
-            }
-
-          }
-
-        }
 
         candidates.push({
 
-          ha: shift.ha,
+          ha:
+            shift.ha,
 
-          hp: shift.hp,
+          hp:
+            shift.hp,
 
           score
 
@@ -1479,35 +1545,30 @@ function makeDailyCandidates(
 
   }
 
-  /*
-    スコア順に並べる
-  */
-
   candidates.sort(
     (a, b) =>
       b.score - a.score
   );
 
   /*
-    候補が多すぎると
-    iPhoneで重くなるので上限を設定
+    上位候補だけを返す。
   */
 
   return candidates.slice(
     0,
-    120
+    100
   );
 
 }
 
 /* =========================================================
-   HA / HP の割り振り
+   HA / HP候補
 ========================================================= */
 
 function makeShiftCandidates(
   working,
   day,
-  previousShifts,
+  previousShift,
   haNeed,
   hpNeed
 ) {
@@ -1527,22 +1588,73 @@ function makeShiftCandidates(
   }
 
   /*
-    HA人数を
-    最低人数～最大人数まで試す。
-    これにより追加勤務を
-    HAにもHPにも振れる。
+    追加勤務がある場合、
+    HA/HPの人数比も極端にならないように
+    基本的には最低人数比を参考にする。
   */
 
-  for (
-    let haCount = haNeed;
-    haCount <= maxHA;
-    haCount++
+  const minimumTotal =
+    haNeed + hpNeed;
+
+  let idealHA =
+    haNeed;
+
+  if (
+    minimumTotal > 0
   ) {
+
+    idealHA =
+      Math.round(
+        working.length *
+        haNeed /
+        minimumTotal
+      );
+
+  }
+
+  idealHA =
+    Math.max(
+      haNeed,
+      Math.min(
+        maxHA,
+        idealHA
+      )
+    );
+
+  const haCounts =
+    new Set([
+      haNeed,
+      idealHA,
+      idealHA - 1,
+      idealHA + 1,
+      maxHA
+    ]);
+
+  const sortedCounts =
+    [...haCounts]
+      .filter(
+        count =>
+          count >= haNeed &&
+          count <= maxHA
+      )
+      .sort(
+        (a, b) =>
+          Math.abs(a - idealHA) -
+          Math.abs(b - idealHA)
+      );
+
+  for (
+    const haCount of sortedCounts
+  ) {
+
+    /*
+      前日HPの人はHA不可
+    */
 
     const eligibleHA =
       working.filter(
         s =>
-          previousShifts[s] !== "HP"
+          previousShift[s] !== "HP"
       );
 
     if (
@@ -1554,44 +1666,45 @@ function makeShiftCandidates(
 
     }
 
-    /*
-      HA適性スコア
-    */
-
-    const rankedHA =
-      [...eligibleHA]
-        .sort(
-          (a, b) =>
-            shiftPreferenceScore(
-              b,
-              "HA",
-              day
-            ) -
-            shiftPreferenceScore(
-              a,
-              "HA",
-              day
-            )
-        );
+    const haSets =
+      combinations(
+        eligibleHA,
+        haCount
+      );
 
     /*
-      上位候補を少し入れ替える
-      ランダム性を持たせる
+      全部試すと多い場合は
+      希望スコア上位を優先。
     */
 
-    const ha =
-      chooseBestCombination(
-        rankedHA,
-        haCount,
-        day
+    haSets.sort(
+      (a, b) =>
+        getShiftSetScore(
+          b,
+          "HA",
+          day,
+          previousShift
+        ) -
+        getShiftSetScore(
+          a,
+          "HA",
+          day,
+          previousShift
+        )
+    );
+
+    const limitedHA =
+      haSets.slice(
+        0,
+        20
       );
 
     for (
-      const selectedHA of ha
+      const ha of limitedHA
     ) {
 
       const haSet =
-        new Set(selectedHA);
+        new Set(ha);
 
       const hp =
         working.filter(
@@ -1608,55 +1721,40 @@ function makeShiftCandidates(
 
       let score = 0;
 
-      /*
-        HA評価
-      */
+      score +=
+        getShiftSetScore(
+          ha,
+          "HA",
+          day,
+          previousShift
+        );
 
-      for (
-        const s of selectedHA
-      ) {
-
-        score +=
-          shiftPreferenceScore(
-            s,
-            "HA",
-            day
-          );
-
-      }
-
-      /*
-        HP評価
-      */
-
-      for (
-        const s of hp
-      ) {
-
-        score +=
-          shiftPreferenceScore(
-            s,
-            "HP",
-            day
-          );
-
-      }
+      score +=
+        getShiftSetScore(
+          hp,
+          "HP",
+          day,
+          previousShift
+        );
 
       /*
-        HA人数を増やしすぎないよう
-        少しだけ減点。
-        ただし追加HAは禁止しない。
+        HA人数が理想人数から
+        離れるほど少し減点
       */
 
       score -=
-        (haCount - haNeed) * 3;
+        Math.abs(
+          haCount -
+          idealHA
+        ) * 5;
 
       result.push({
 
         ha:
-          selectedHA,
+          ha,
 
-        hp,
+        hp:
+          hp,
 
         score
 
@@ -1666,177 +1764,87 @@ function makeShiftCandidates(
 
   }
 
-  return result.sort(
+  result.sort(
     (a, b) =>
       b.score - a.score
-  ).slice(
+  );
+
+  return result.slice(
     0,
-    30
+    40
   );
 
 }
 
 /* =========================================================
-   希望・前日継続の評価
+   シフト組み合わせ評価
 ========================================================= */
 
-function shiftPreferenceScore(
-  s,
+function getShiftSetScore(
+  set,
   shift,
-  day
+  day,
+  previousShift
 ) {
 
   let score = 0;
 
-  const request =
-    requests[s][day];
-
-  /*
-    希望一致
-  */
-
-  if (
-    request === shift
+  for (
+    const s of set
   ) {
 
-    score += 100;
+    const request =
+      requests[s][day];
+
+    /*
+      希望一致
+    */
+
+    if (
+      request === shift
+    ) {
+
+      score += 100;
+
+    }
+
+    /*
+      希望と違う場合は軽く減点
+    */
+
+    if (
+      (
+        request === "HA" ||
+        request === "HP"
+      ) &&
+      request !== shift
+    ) {
+
+      score -= 30;
+
+    }
+
+    /*
+      前日と同じ勤務を少し優先
+    */
+
+    if (
+      previousShift[s] === shift
+    ) {
+
+      score += 15;
+
+    }
 
   }
-
-  /*
-    希望と違う勤務は少し減点
-  */
-
-  if (
-    request === "HA" &&
-    shift !== "HA"
-  ) {
-
-    score -= 40;
-
-  }
-
-  if (
-    request === "HP" &&
-    shift !== "HP"
-  ) {
-
-    score -= 40;
-
-  }
-
-  /*
-    前日と同じ勤務を少し優先
-  */
-
-  if (
-    previousState[s].shift === shift ||
-    (day > 0 && false)
-  ) {
-
-    score += 15;
-
-  }
-
-  /*
-    前日HP→当日HAは禁止なので
-    ここではHA評価を下げるだけではなく
-    実際の候補から除外している。
-  */
 
   return score;
 
 }
 
 /* =========================================================
-   HA候補の組み合わせ
-========================================================= */
-
-function chooseBestCombination(
-  array,
-  count,
-  day
-) {
-
-  if (
-    count === 0
-  ) {
-
-    return [[]];
-
-  }
-
-  if (
-    array.length < count
-  ) {
-
-    return [];
-
-  }
-
-  /*
-    全組み合わせを作る。
-    最大10人なので十分軽い。
-  */
-
-  const all =
-    combinations(
-      array,
-      count
-    );
-
-  /*
-    希望を考慮して並べる。
-  */
-
-  all.sort(
-    (a, b) => {
-
-      const scoreA =
-        a.reduce(
-          (sum, s) =>
-            sum +
-            shiftPreferenceScore(
-              s,
-              "HA",
-              day
-            ),
-          0
-        );
-
-      const scoreB =
-        b.reduce(
-          (sum, s) =>
-            sum +
-            shiftPreferenceScore(
-              s,
-              "HA",
-              day
-            ),
-          0
-        );
-
-      return scoreB - scoreA;
-
-    }
-  );
-
-  /*
-    上位候補＋少しランダム
-  */
-
-  const top =
-    all.slice(
-      0,
-      Math.min(8, all.length)
-    );
-
-  return shuffle(top);
-
-}
-
-/* =========================================================
-   シフト作成
+   スケジュール作成
+   ★バックトラッキング方式
 ========================================================= */
 
 function generateSchedule() {
@@ -1859,14 +1867,14 @@ function generateSchedule() {
     haNeed + hpNeed;
 
   if (
-    staff.length < minimum
+    minimum > staff.length
   ) {
 
     return {
       error:
-        `スタッフが${staff.length}人しかいません。` +
         `HA${haNeed}人＋HP${hpNeed}人なので、` +
-        `最低${minimum}人必要です。`
+        `最低${minimum}人必要ですが、` +
+        `スタッフは${staff.length}人です。`
     };
 
   }
@@ -1876,31 +1884,37 @@ function generateSchedule() {
       maxConsecutiveSelect.value
     );
 
+  const {
+    offTarget,
+    totalWork
+  } =
+    getWorkTarget();
+
   /*
-    各人の必要休日数
+    公休＋有休が月の日数を超えていないか
   */
 
-  const offTarget =
-    staff.map(
-      p =>
-        Number(p.publicHoliday) +
-        Number(p.paidLeave)
-    );
+  for (
+    let s = 0;
+    s < staff.length;
+    s++
+  ) {
+
+    if (
+      offTarget[s] > days
+    ) {
+
+      return {
+        error:
+          `${staff[s].name}さんの公休＋有休が月の日数を超えています。`
+      };
+
+    }
+
+  }
 
   /*
-    総勤務日数
-  */
-
-  const totalWork =
-    staff.length * days -
-    offTarget.reduce(
-      (a, b) => a + b,
-      0
-    );
-
-  /*
-    最低人数を月平均で
-    満たせないなら不可能
+    月全体で最低人数を確保できるか
   */
 
   if (
@@ -1911,103 +1925,93 @@ function generateSchedule() {
     return {
       error:
         `公休・有休を考慮すると、` +
-        `月全体の勤務日数が不足しています。` +
-        `<br>必要な最低勤務人数は1日${minimum}人です。`
+        `月全体の勤務日数が不足しています。`
     };
 
   }
 
   /*
-    1日の平均勤務人数
+    1日の理想人数
   */
 
   const dailyTargets =
-    createDailyWorkTargets(
+    createDailyTargets(
       totalWork
     );
 
   /*
-    希望休数チェック
+    希望休チェック
   */
 
-  for (
-    let s = 0;
-    s < staff.length;
-    s++
+  const requestError =
+    validateRequests();
+
+  if (
+    requestError
   ) {
 
-    let fixedOff = 0;
-    let fixedPaid = 0;
-
-    for (
-      let d = 0;
-      d < days;
-      d++
-    ) {
-
-      if (
-        requests[s][d] === "休"
-      ) {
-
-        fixedOff++;
-
-      }
-
-      if (
-        requests[s][d] === "有休"
-      ) {
-
-        fixedOff++;
-        fixedPaid++;
-
-      }
-
-    }
-
-    if (
-      fixedPaid >
-      Number(staff[s].paidLeave)
-    ) {
-
-      return {
-        error:
-          `${staff[s].name}さんの有休希望が設定数を超えています。`
-      };
-
-    }
-
-    if (
-      fixedOff >
-      offTarget[s]
-    ) {
-
-      return {
-        error:
-          `${staff[s].name}さんの休み希望が多すぎます。`
-      };
-
-    }
+    return {
+      error:
+        requestError
+    };
 
   }
 
-  let best = null;
-  let bestScore = -Infinity;
-
   /*
-    ランダム探索
+    前月状態を正規化
   */
 
-  const attempts = 300;
+  const initialRun =
+    previousState.map(
+      state => {
+
+        if (
+          state.shift === "休" ||
+          state.shift === "有休"
+        ) {
+
+          return 0;
+
+        }
+
+        return Number(
+          state.consecutive
+        ) || 0;
+
+      }
+    );
+
+  const initialShift =
+    previousState.map(
+      state =>
+        state.shift || "休"
+    );
+
+  /*
+    試行回数
+  */
+
+  const ATTEMPTS = 80;
+
+  let bestSchedule = null;
+  let bestScore = -Infinity;
 
   for (
     let attempt = 0;
-    attempt < attempts;
+    attempt < ATTEMPTS;
     attempt++
   ) {
 
+    /*
+      毎回少し違う候補順にする
+    */
+
     const result =
       Array.from(
-        {length: staff.length},
+        {
+          length:
+            staff.length
+        },
         () =>
           new Array(days)
             .fill(null)
@@ -2019,79 +2023,74 @@ function generateSchedule() {
       ).fill(0);
 
     const run =
-      previousState.map(
-        state =>
-          Number(state.consecutive) || 0
-      );
+      [...initialRun];
 
-    const previousShift =
-      previousState.map(
-        state =>
-          state.shift || "休"
-      );
+    const prevShift =
+      [...initialShift];
+
+    let nodeCount = 0;
 
     /*
-      固定休を設定
+      深さ優先探索
     */
 
-    for (
-      let s = 0;
-      s < staff.length;
-      s++
-    ) {
+    function search(day) {
 
-      for (
-        let d = 0;
-        d < days;
-        d++
+      /*
+        安全装置
+      */
+
+      nodeCount++;
+
+      if (
+        nodeCount > 25000
       ) {
 
-        if (
-          requests[s][d] === "有休"
-        ) {
-
-          result[s][d] =
-            "有休";
-
-          offCount[s]++;
-
-        }
-
-        else if (
-          requests[s][d] === "休"
-        ) {
-
-          result[s][d] =
-            "休";
-
-          offCount[s]++;
-
-        }
+        return false;
 
       }
 
-    }
+      /*
+        月末まで到達
+      */
 
-    let failed = false;
+      if (
+        day >= days
+      ) {
 
-    /*
-      日ごとに作成
-    */
+        for (
+          let s = 0;
+          s < staff.length;
+          s++
+        ) {
 
-    for (
-      let d = 0;
-      d < days;
-      d++
-    ) {
+          if (
+            offCount[s] !==
+            offTarget[s]
+          ) {
 
-      const candidates =
+            return false;
+
+          }
+
+        }
+
+        return true;
+
+      }
+
+      /*
+        今日の候補
+      */
+
+      let candidates =
         makeDailyCandidates(
-          d,
-          previousShift,
+          day,
+          prevShift,
           run,
           offCount,
           offTarget,
-          dailyTargets[d],
+          dailyTargets[day],
           maxConsecutive
         );
 
@@ -2099,127 +2098,175 @@ function generateSchedule() {
         candidates.length === 0
       ) {
 
-        failed = true;
-        break;
+        return false;
 
       }
 
       /*
-        上位候補からランダム選択
+        同じ条件でも毎回少し順番を変える
       */
 
-      const pool =
-        candidates.slice(
-          0,
-          Math.min(
-            35,
-            candidates.length
-          )
-        );
-
-      const chosen =
-        pool[
-          Math.floor(
-            Math.random() *
-            pool.length
-          )
-        ];
-
-      const working =
-        new Set([
-          ...chosen.ha,
-          ...chosen.hp
-        ]);
-
-      for (
-        let s = 0;
-        s < staff.length;
-        s++
+      if (
+        candidates.length > 1
       ) {
 
-        if (
-          working.has(s)
+        const top =
+          candidates.slice(
+            0,
+            Math.min(
+              15,
+              candidates.length
+            )
+          );
+
+        const rest =
+          candidates.slice(
+            15
+          );
+
+        candidates =
+          [
+            ...shuffle(top),
+            ...rest
+          ];
+
+      }
+
+      for (
+        const candidate of candidates
+      ) {
+
+        const working =
+          new Set([
+            ...candidate.ha,
+            ...candidate.hp
+          ]);
+
+        /*
+          今日の状態を保存
+        */
+
+        const oldRun =
+          [...run];
+
+        const oldOff =
+          [...offCount];
+
+        const oldPrev =
+          [...prevShift];
+
+        /*
+          今日をセット
+        */
+
+        for (
+          let s = 0;
+          s < staff.length;
+          s++
         ) {
 
           if (
-            chosen.ha.includes(s)
+            working.has(s)
           ) {
 
-            result[s][d] =
-              "HA";
+            if (
+              candidate.ha.includes(s)
+            ) {
 
-          } else {
+              result[s][day] =
+                "HA";
 
-            result[s][d] =
-              "HP";
+            } else {
+
+              result[s][day] =
+                "HP";
+
+            }
+
+            run[s]++;
+
+            prevShift[s] =
+              result[s][day];
 
           }
 
-          run[s]++;
+          else {
 
-          previousShift[s] =
-            result[s][d];
+            result[s][day] =
+              requests[s][day] === "有休"
+                ? "有休"
+                : "休";
+
+            offCount[s]++;
+
+            run[s] = 0;
+
+            prevShift[s] =
+              result[s][day];
+
+          }
 
         }
 
-        else {
+        /*
+          次の日へ。
+          ダメならここで元に戻して
+          別候補を試す。
+        */
 
-          if (
-            result[s][d] !== "有休" &&
-            result[s][d] !== "休"
-          ) {
+        if (
+          search(day + 1)
+        ) {
 
-            result[s][d] =
-              "休";
+          return true;
 
-          }
+        }
 
-          offCount[s]++;
+        /*
+          巻き戻し
+        */
 
-          run[s] = 0;
+        for (
+          let s = 0;
+          s < staff.length;
+          s++
+        ) {
 
-          previousShift[s] =
-            result[s][d];
+          result[s][day] =
+            null;
+
+          run[s] =
+            oldRun[s];
+
+          offCount[s] =
+            oldOff[s];
+
+          prevShift[s] =
+            oldPrev[s];
 
         }
 
       }
 
-    }
-
-    if (failed)
-      continue;
-
-    /*
-      最終的な休日日数確認
-    */
-
-    for (
-      let s = 0;
-      s < staff.length;
-      s++
-    ) {
-
-      if (
-        offCount[s] !==
-        offTarget[s]
-      ) {
-
-        failed = true;
-        break;
-
-      }
+      return false;
 
     }
 
-    if (failed)
+    const success =
+      search(0);
+
+    if (!success)
       continue;
 
     /*
-      スケジュール評価
+      完成したシフトを評価
     */
 
     let score = 0;
+
+    /*
+      希望一致
+    */
 
     for (
       let s = 0;
@@ -2233,47 +2280,12 @@ function generateSchedule() {
         d++
       ) {
 
-        const current =
-          result[s][d];
-
-        /*
-          希望一致
-        */
-
         if (
           requests[s][d] ===
-          current
+          result[s][d]
         ) {
 
           score += 100;
-
-        }
-
-        /*
-          HA連続
-        */
-
-        if (
-          current === "HA" &&
-          d > 0 &&
-          result[s][d - 1] === "HA"
-        ) {
-
-          score += 12;
-
-        }
-
-        /*
-          HP連続
-        */
-
-        if (
-          current === "HP" &&
-          d > 0 &&
-          result[s][d - 1] === "HP"
-        ) {
-
-          score += 12;
 
         }
 
@@ -2282,8 +2294,10 @@ function generateSchedule() {
     }
 
     /*
-      日ごとの人数のばらつきを評価
+      1日の人数バランス
     */
+
+    const workCounts = [];
 
     for (
       let d = 0;
@@ -2291,7 +2305,7 @@ function generateSchedule() {
       d++
     ) {
 
-      let workCount = 0;
+      let count = 0;
 
       for (
         let s = 0;
@@ -2304,26 +2318,46 @@ function generateSchedule() {
           result[s][d] === "HP"
         ) {
 
-          workCount++;
+          count++;
 
         }
 
       }
 
+      workCounts.push(count);
+
       /*
-        目標人数との差を強く減点
+        理想人数との差を強く評価
       */
 
       score -=
-        Math.abs(
-          workCount -
-          dailyTargets[d]
-        ) * 300;
+        Math.pow(
+          count -
+          dailyTargets[d],
+          2
+        ) * 500;
 
     }
 
     /*
-      単発勤務を減点
+      最大人数と最小人数の差も減点
+    */
+
+    const maxWork =
+      Math.max(
+        ...workCounts
+      );
+
+    const minWork =
+      Math.min(
+        ...workCounts
+      );
+
+    score -=
+      (maxWork - minWork) * 100;
+
+    /*
+      単発勤務を少し減点
     */
 
     for (
@@ -2345,15 +2379,15 @@ function generateSchedule() {
         if (!working)
           continue;
 
-        const before =
+        const beforeWorking =
           d === 0
-            ? previousState[s].consecutive > 0
+            ? initialRun[s] > 0
             : (
                 result[s][d - 1] === "HA" ||
                 result[s][d - 1] === "HP"
               );
 
-        const after =
+        const afterWorking =
           d === days - 1
             ? false
             : (
@@ -2362,37 +2396,13 @@ function generateSchedule() {
               );
 
         if (
-          !before &&
-          !after
+          !beforeWorking &&
+          !afterWorking
         ) {
 
-          score -= 100;
+          score -= 50;
 
         }
-
-      }
-
-    }
-
-    /*
-      月初の連勤継続を少し評価
-    */
-
-    for (
-      let s = 0;
-      s < staff.length;
-      s++
-    ) {
-
-      if (
-        previousState[s].consecutive > 0 &&
-        (
-          result[s][0] === "HA" ||
-          result[s][0] === "HP"
-        )
-      ) {
-
-        score += 15;
 
       }
 
@@ -2402,14 +2412,21 @@ function generateSchedule() {
       score > bestScore
     ) {
 
-      bestScore = score;
-      best = result;
+      bestScore =
+        score;
+
+      bestSchedule =
+        result.map(
+          row => [...row]
+        );
 
     }
 
   }
 
-  if (!best) {
+  if (
+    !bestSchedule
+  ) {
 
     return {
       error:
@@ -2419,7 +2436,8 @@ function generateSchedule() {
   }
 
   return {
-    schedule: best
+    schedule:
+      bestSchedule
   };
 
 }
@@ -2428,7 +2446,9 @@ function generateSchedule() {
    最終検証
 ========================================================= */
 
-function validateSchedule(result) {
+function validateSchedule(
+  result
+) {
 
   const haNeed =
     Number(
@@ -2450,8 +2470,7 @@ function validateSchedule(result) {
     );
 
   /*
-    日別人数
-    ★「ちょうど」ではなく「最低」
+    日ごとの最低人数
   */
 
   for (
@@ -2491,10 +2510,6 @@ function validateSchedule(result) {
 
     }
 
-    /*
-      最低人数チェック
-    */
-
     if (
       ha < haNeed
     ) {
@@ -2512,17 +2527,24 @@ function validateSchedule(result) {
     }
 
     /*
-      レベル1
+      レベル1勤務時は
+      レベル2が最低1人
     */
 
     const hasLevel1 =
       working.some(
-        s => staff[s].level === 1
+        s =>
+          Number(
+            staff[s].level
+          ) === 1
       );
 
     const hasLevel2 =
       working.some(
-        s => staff[s].level === 2
+        s =>
+          Number(
+            staff[s].level
+          ) === 2
       );
 
     if (
@@ -2537,7 +2559,7 @@ function validateSchedule(result) {
   }
 
   /*
-    連勤
+    最大連勤
   */
 
   for (
@@ -2547,9 +2569,9 @@ function validateSchedule(result) {
   ) {
 
     let run =
-      Number(
-        previousState[s].consecutive
-      ) || 0;
+      initialConsecutiveForValidation(
+        s
+      );
 
     for (
       let d = 0;
@@ -2561,7 +2583,9 @@ function validateSchedule(result) {
         result[s][d] === "HA" ||
         result[s][d] === "HP";
 
-      if (working) {
+      if (
+        working
+      ) {
 
         run++;
 
@@ -2573,7 +2597,8 @@ function validateSchedule(result) {
 
         }
 
-      } else {
+      }
+      else {
 
         run = 0;
 
@@ -2584,7 +2609,7 @@ function validateSchedule(result) {
   }
 
   /*
-    HP→翌日HA
+    HP → 翌日HA
   */
 
   for (
@@ -2622,7 +2647,7 @@ function validateSchedule(result) {
   }
 
   /*
-    希望休
+    希望休・有休
   */
 
   for (
@@ -2660,7 +2685,7 @@ function validateSchedule(result) {
   }
 
   /*
-    公休・有休数
+    公休＋有休の合計
   */
 
   for (
@@ -2689,8 +2714,12 @@ function validateSchedule(result) {
     }
 
     const target =
-      Number(staff[s].publicHoliday) +
-      Number(staff[s].paidLeave);
+      Number(
+        staff[s].publicHoliday
+      ) +
+      Number(
+        staff[s].paidLeave
+      );
 
     if (
       off !== target
@@ -2703,6 +2732,23 @@ function validateSchedule(result) {
   }
 
   return "";
+
+}
+
+function initialConsecutiveForValidation(s) {
+
+  if (
+    previousState[s].shift === "休" ||
+    previousState[s].shift === "有休"
+  ) {
+
+    return 0;
+
+  }
+
+  return Number(
+    previousState[s].consecutive
+  ) || 0;
 
 }
 
@@ -2889,32 +2935,13 @@ document.getElementById(
     message.innerHTML = `
       <div class="success">
         シフトを作成しています……<br>
-        人数のばらつきもできるだけ均等にしています。
+        勤務人数をできるだけ均等にしています。
       </div>
     `;
 
     setTimeout(() => {
 
       try {
-
-        const requestError =
-          validateRequests();
-
-        if (
-          requestError
-        ) {
-
-          message.innerHTML = `
-            <div class="error">
-              ${escapeHtml(
-                requestError
-              )}
-            </div>
-          `;
-
-          return;
-
-        }
 
         const result =
           generateSchedule();
@@ -2928,10 +2955,6 @@ document.getElementById(
               ${escapeHtml(
                 result.error
               )}
-              <br><br>
-              公休数・有休数・希望休・最大連勤・
-              前月末の状態などの組み合わせによって、
-              条件を満たせない場合があります。
             </div>
           `;
 
@@ -2966,7 +2989,7 @@ document.getElementById(
         renderResult();
 
         /*
-          実際の人数分布も確認して表示
+          実際の1日ごとの勤務人数
         */
 
         const distribution = [];
@@ -2996,7 +3019,9 @@ document.getElementById(
 
           }
 
-          distribution.push(count);
+          distribution.push(
+            count
+          );
 
         }
 
@@ -3014,7 +3039,8 @@ document.getElementById(
           behavior: "smooth"
         });
 
-      } catch (error) {
+      }
+      catch (error) {
 
         console.error(error);
 
@@ -3081,7 +3107,8 @@ days =
 
 document.getElementById(
   "daysLabel"
-).textContent = days;
+).textContent =
+  days;
 
 createStaff();
 
