@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -6,234 +6,181 @@
 <title>シフト作成</title>
 
 <style>
-* {
-    box-sizing: border-box;
+*{box-sizing:border-box}
+
+body{
+    font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;
+    background:#f5f5f7;
+    margin:0;
+    padding:15px;
+    color:#222;
 }
 
-body {
-    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
-    background: #f5f5f7;
-    margin: 0;
-    padding: 15px;
-    color: #222;
+.container{
+    max-width:1100px;
+    margin:auto;
 }
 
-.container {
-    max-width: 1000px;
-    margin: auto;
+h1{
+    text-align:center;
+    margin:10px 0 20px;
 }
 
-h1 {
-    text-align: center;
-    margin: 10px 0 20px;
+.card{
+    background:white;
+    padding:18px;
+    border-radius:16px;
+    margin-bottom:15px;
+    box-shadow:0 2px 8px rgba(0,0,0,.06);
 }
 
-.card {
-    background: white;
-    padding: 18px;
-    border-radius: 16px;
-    margin-bottom: 15px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+h2{
+    font-size:20px;
+    margin-top:0;
 }
 
-h2 {
-    font-size: 20px;
-    margin-top: 0;
+label{
+    display:block;
+    font-weight:bold;
+    margin-top:12px;
 }
 
-h3 {
-    font-size: 17px;
-    margin-bottom: 10px;
+input,select{
+    width:100%;
+    padding:11px;
+    margin-top:5px;
+    border:1px solid #ccc;
+    border-radius:9px;
+    background:white;
+    font-size:16px;
 }
 
-label {
-    display: block;
-    font-weight: bold;
-    margin-top: 12px;
+button{
+    width:100%;
+    padding:14px;
+    border:0;
+    border-radius:10px;
+    margin-top:12px;
+    font-size:16px;
+    font-weight:bold;
 }
 
-input,
-select,
-button {
-    font-size: 16px;
+.primary{
+    background:#007aff;
+    color:white;
 }
 
-input,
-select {
-    width: 100%;
-    padding: 11px;
-    margin-top: 5px;
-    border: 1px solid #ccc;
-    border-radius: 9px;
-    background: white;
+.secondary{
+    background:#e9e9ee;
+    color:#222;
 }
 
-button {
-    width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 10px;
-    margin-top: 12px;
-    font-weight: bold;
-    cursor: pointer;
+.staff{
+    border:1px solid #ddd;
+    border-radius:12px;
+    padding:12px;
+    margin-bottom:10px;
 }
 
-.primary {
-    background: #007aff;
-    color: white;
+.staff-grid{
+    display:grid;
+    grid-template-columns:1.5fr 1fr 1fr 1fr;
+    gap:8px;
 }
 
-.secondary {
-    background: #e9e9ee;
-    color: #222;
+.small-label{
+    font-size:12px;
+    margin:0;
 }
 
-.danger {
-    background: #ff3b30;
-    color: white;
+.help{
+    color:#666;
+    font-size:13px;
+    line-height:1.5;
 }
 
-.staff {
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    padding: 12px;
-    margin-bottom: 10px;
+.scroll{
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
 }
 
-.staff-title {
-    font-weight: bold;
-    margin-bottom: 8px;
+table{
+    border-collapse:collapse;
+    width:100%;
+    min-width:700px;
 }
 
-.staff-grid {
-    display: grid;
-    grid-template-columns: 1.5fr 1fr 1fr 1fr;
-    gap: 8px;
+th,td{
+    border:1px solid #ccc;
+    padding:6px;
+    text-align:center;
+    white-space:nowrap;
 }
 
-.small-label {
-    font-size: 12px;
-    font-weight: bold;
-    margin: 0;
+th{
+    background:#f0f0f3;
 }
 
-.help {
-    color: #666;
-    font-size: 13px;
-    line-height: 1.5;
+.shift-HA{
+    background:#fff4cc;
+    font-weight:bold;
 }
 
-.request-table-wrapper,
-.result-wrapper {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+.shift-HP{
+    background:#dceeff;
+    font-weight:bold;
 }
 
-table {
-    border-collapse: collapse;
-    width: 100%;
-    min-width: 700px;
+.shift-off{
+    background:#eee;
 }
 
-th,
-td {
-    border: 1px solid #ccc;
-    padding: 6px;
-    text-align: center;
-    white-space: nowrap;
+.shift-paid{
+    background:#e5d8ff;
+    font-weight:bold;
 }
 
-th {
-    background: #f0f0f3;
+.success{
+    background:#edfff2;
+    color:#167333;
+    padding:14px;
+    border-radius:10px;
+    margin-bottom:12px;
 }
 
-.shift-HA {
-    background: #fff4cc;
-    font-weight: bold;
+.error{
+    background:#fff0f0;
+    color:#b00000;
+    padding:14px;
+    border-radius:10px;
+    line-height:1.6;
 }
 
-.shift-HP {
-    background: #dceeff;
-    font-weight: bold;
+.legend{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin:10px 0;
 }
 
-.shift-off {
-    background: #eeeeee;
+.legend span{
+    padding:5px 9px;
+    border-radius:6px;
+    font-size:13px;
 }
 
-.shift-paid {
-    background: #e5d8ff;
-    font-weight: bold;
-}
+.lha{background:#fff4cc}
+.lhp{background:#dceeff}
+.loff{background:#eee}
+.lpaid{background:#e5d8ff}
 
-.request-table select {
-    min-width: 78px;
-}
-
-.result-info {
-    padding: 12px;
-    background: #f1f8ff;
-    border-radius: 10px;
-    margin-bottom: 12px;
-    line-height: 1.6;
-}
-
-.error {
-    background: #fff0f0;
-    color: #c00;
-    padding: 14px;
-    border-radius: 10px;
-    line-height: 1.6;
-}
-
-.success {
-    background: #edfff2;
-    color: #167333;
-    padding: 14px;
-    border-radius: 10px;
-    line-height: 1.6;
-}
-
-.legend {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin: 10px 0;
-}
-
-.legend span {
-    padding: 5px 9px;
-    border-radius: 6px;
-    font-size: 13px;
-}
-
-.legend-ha {
-    background: #fff4cc;
-}
-
-.legend-hp {
-    background: #dceeff;
-}
-
-.legend-off {
-    background: #eee;
-}
-
-.legend-paid {
-    background: #e5d8ff;
-}
-
-@media (max-width: 600px) {
-    .staff-grid {
-        grid-template-columns: 1fr 1fr;
+@media(max-width:600px){
+    .staff-grid{
+        grid-template-columns:1fr 1fr;
     }
 
-    .staff-grid > div:first-child {
-        grid-column: span 2;
-    }
-
-    h1 {
-        font-size: 24px;
+    .staff-grid>div:first-child{
+        grid-column:span 2;
     }
 }
 </style>
@@ -245,7 +192,6 @@ th {
 
 <h1>📅 シフト作成</h1>
 
-<!-- 基本設定 -->
 <div class="card">
 
 <h2>① 基本設定</h2>
@@ -255,32 +201,30 @@ th {
 
 <label>スタッフ人数</label>
 <select id="staffCount" onchange="buildStaffSettings()">
-    <option value="1">1人</option>
-    <option value="2">2人</option>
-    <option value="3">3人</option>
-    <option value="4">4人</option>
-    <option value="5">5人</option>
-    <option value="6">6人</option>
-    <option value="7">7人</option>
-    <option value="8">8人</option>
-    <option value="9">9人</option>
-    <option value="10" selected>10人</option>
+<option value="1">1人</option>
+<option value="2">2人</option>
+<option value="3">3人</option>
+<option value="4">4人</option>
+<option value="5">5人</option>
+<option value="6">6人</option>
+<option value="7">7人</option>
+<option value="8">8人</option>
+<option value="9">9人</option>
+<option value="10" selected>10人</option>
 </select>
 
 <label>最大連勤</label>
 <select id="maxConsecutive">
-    <option value="2">2連勤</option>
-    <option value="3" selected>3連勤</option>
+<option value="3" selected>3連勤</option>
 </select>
 
 <p class="help">
 通常は最大3連勤です。<br>
-希望休を優先するため必要な場合のみ、4連勤を許可します。
+希望休を優先するために必要な場合のみ4連勤を許可します。
 </p>
 
 </div>
 
-<!-- 必要人数 -->
 <div class="card">
 
 <h2>② 1日の必要人数</h2>
@@ -306,7 +250,6 @@ HP：13:30〜22:30
 
 </div>
 
-<!-- スタッフ -->
 <div class="card">
 
 <h2>③ スタッフ設定</h2>
@@ -320,21 +263,19 @@ HP：13:30〜22:30
 
 </div>
 
-<!-- 希望設定 -->
 <div class="card">
 
 <h2>④ 希望休・希望勤務</h2>
 
 <p class="help">
-休・有休はできるだけ優先します。<br>
-HA希望・HP希望は希望として優先します。
+「休」「有休」は固定します。<br>
+HA希望・HP希望はできるだけ優先します。
 </p>
 
 <div id="requestArea"></div>
 
 </div>
 
-<!-- 作成 -->
 <div class="card">
 
 <button class="primary" onclick="generateSchedule()">
@@ -347,7 +288,6 @@ HA希望・HP希望は希望として優先します。
 
 </div>
 
-<!-- 結果 -->
 <div class="card">
 
 <h2>⑤ シフト結果</h2>
@@ -362,901 +302,1011 @@ HA希望・HP希望は希望として優先します。
 
 <script>
 
-/* =========================
-   初期設定
-========================= */
+/* =========================================
+   初期化
+========================================= */
 
-const names = [
-    "A","B","C","D","E",
-    "F","G","H","I","J"
+const defaultNames=[
+"A","B","C","D","E",
+"F","G","H","I","J"
 ];
 
-let currentSchedule = null;
+function setDefaultMonth(){
 
+    const now=new Date();
 
-/* =========================
-   初期年月
-========================= */
-
-function setDefaultMonth() {
-
-    const now = new Date();
-
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2,"0");
-
-    document.getElementById("yearMonth").value =
-        year + "-" + month;
+    document.getElementById("yearMonth").value=
+        now.getFullYear()+"-"+
+        String(now.getMonth()+1).padStart(2,"0");
 }
 
 
-/* =========================
+/* =========================================
+   月の日数
+========================================= */
+
+function getDays(){
+
+    const v=document.getElementById("yearMonth").value;
+
+    if(!v)return 30;
+
+    const [y,m]=v.split("-").map(Number);
+
+    return new Date(y,m,0).getDate();
+}
+
+
+/* =========================================
+   数値選択肢
+========================================= */
+
+function numberOptions(max,selected){
+
+    let h="";
+
+    for(let i=0;i<=max;i++){
+
+        h+=`
+        <option value="${i}" ${i===selected?"selected":""}>
+        ${i}
+        </option>`;
+    }
+
+    return h;
+}
+
+
+/* =========================================
    スタッフ設定
-========================= */
+========================================= */
 
-function buildStaffSettings() {
+function buildStaffSettings(){
 
-    const count =
+    const count=
         Number(document.getElementById("staffCount").value);
 
-    let html = "";
+    let html="";
 
-    for (let i = 0; i < count; i++) {
+    for(let i=0;i<count;i++){
 
-        html += `
+        html+=`
         <div class="staff">
 
-            <div class="staff-title">
-                スタッフ${i + 1}
-            </div>
+        <strong>スタッフ${i+1}</strong>
 
-            <div class="staff-grid">
+        <div class="staff-grid">
 
-                <div>
-                    <label class="small-label">名前</label>
-                    <input
-                        id="name_${i}"
-                        value="${names[i]}"
-                        maxlength="20"
-                    >
-                </div>
+        <div>
+        <label class="small-label">名前</label>
+        <input
+            id="name_${i}"
+            value="${defaultNames[i]}"
+            maxlength="20"
+            onchange="buildRequestArea()">
+        </div>
 
-                <div>
-                    <label class="small-label">レベル</label>
-                    <select id="level_${i}">
-                        <option value="1">1（研修中）</option>
-                        <option value="2" selected>2（独り立ち）</option>
-                    </select>
-                </div>
+        <div>
+        <label class="small-label">レベル</label>
+        <select id="level_${i}">
+            <option value="1">1（研修中）</option>
+            <option value="2" selected>2（独り立ち）</option>
+        </select>
+        </div>
 
-                <div>
-                    <label class="small-label">公休</label>
-                    <select id="off_${i}">
-                        ${makeNumberOptions(0,31,11)}
-                    </select>
-                </div>
+        <div>
+        <label class="small-label">公休</label>
+        <select id="off_${i}">
+            ${numberOptions(31,11)}
+        </select>
+        </div>
 
-                <div>
-                    <label class="small-label">有休</label>
-                    <select id="paid_${i}">
-                        ${makeNumberOptions(0,31,0)}
-                    </select>
-                </div>
+        <div>
+        <label class="small-label">有休</label>
+        <select id="paid_${i}">
+            ${numberOptions(31,0)}
+        </select>
+        </div>
 
-            </div>
-
+        </div>
         </div>
         `;
     }
 
-    document.getElementById("staffSettings").innerHTML = html;
+    document.getElementById("staffSettings").innerHTML=html;
 
     buildRequestArea();
 }
 
 
-/* =========================
-   数値選択肢
-========================= */
+/* =========================================
+   希望入力
+========================================= */
 
-function makeNumberOptions(min,max,selected) {
+function buildRequestArea(){
 
-    let html = "";
-
-    for (let i = min; i <= max; i++) {
-
-        html += `
-        <option value="${i}" ${i === selected ? "selected" : ""}>
-            ${i}
-        </option>
-        `;
-    }
-
-    return html;
-}
-
-
-/* =========================
-   月の日数
-========================= */
-
-function getDaysInMonth() {
-
-    const value =
-        document.getElementById("yearMonth").value;
-
-    if (!value) return 30;
-
-    const [year,month] = value.split("-").map(Number);
-
-    return new Date(year,month,0).getDate();
-}
-
-
-/* =========================
-   希望設定
-========================= */
-
-function buildRequestArea() {
-
-    const count =
+    const count=
         Number(document.getElementById("staffCount").value);
 
-    const days = getDaysInMonth();
+    const days=getDays();
 
-    let html = `
-    <div class="request-table-wrapper">
-    <table class="request-table">
+    let html=`
+    <div class="scroll">
+    <table>
     <tr>
-        <th>名前</th>
+    <th>名前</th>
     `;
 
-    for (let d = 1; d <= days; d++) {
-
-        html += `<th>${d}</th>`;
+    for(let d=1;d<=days;d++){
+        html+=`<th>${d}</th>`;
     }
 
-    html += "</tr>";
+    html+="</tr>";
 
-    for (let i = 0; i < count; i++) {
+    for(let i=0;i<count;i++){
 
-        const nameInput =
+        const nameEl=
             document.getElementById(`name_${i}`);
 
-        const name =
-            nameInput ? nameInput.value : names[i];
+        const name=
+            nameEl ? nameEl.value : defaultNames[i];
 
-        html += `
+        html+=`
         <tr>
-            <th>${escapeHtml(name)}</th>
+        <th>${escapeHtml(name)}</th>
         `;
 
-        for (let d = 1; d <= days; d++) {
+        for(let d=1;d<=days;d++){
 
-            html += `
+            html+=`
             <td>
-                <select id="req_${i}_${d}">
-                    <option value="">指定なし</option>
-                    <option value="HA">HA希望</option>
-                    <option value="HP">HP希望</option>
-                    <option value="休">休</option>
-                    <option value="有休">有休</option>
-                </select>
-            </td>
-            `;
+            <select id="req_${i}_${d}">
+                <option value="">指定なし</option>
+                <option value="HA">HA希望</option>
+                <option value="HP">HP希望</option>
+                <option value="休">休</option>
+                <option value="有休">有休</option>
+            </select>
+            </td>`;
         }
 
-        html += "</tr>";
+        html+="</tr>";
     }
 
-    html += `
+    html+=`
     </table>
-    </div>
-    `;
+    </div>`;
 
-    document.getElementById("requestArea").innerHTML = html;
+    document.getElementById("requestArea").innerHTML=html;
 }
 
 
-/* =========================
-   年月変更
-========================= */
+/* =========================================
+   情報取得
+========================================= */
 
-document.getElementById("yearMonth").addEventListener(
-    "change",
-    buildRequestArea
-);
+function getStaff(){
 
+    const count=
+        Number(document.getElementById("staffCount").value);
 
-/* =========================
-   名前変更時
-========================= */
+    const result=[];
 
-document.addEventListener("input", function(e) {
+    for(let i=0;i<count;i++){
 
-    if (e.target.id && e.target.id.startsWith("name_")) {
+        result.push({
+            name:
+                document.getElementById(`name_${i}`).value
+                ||defaultNames[i],
 
-        buildRequestArea();
+            level:
+                Number(document.getElementById(`level_${i}`).value),
+
+            off:
+                Number(document.getElementById(`off_${i}`).value),
+
+            paid:
+                Number(document.getElementById(`paid_${i}`).value)
+        });
     }
-});
+
+    return result;
+}
 
 
-/* =========================
-   希望リセット
-========================= */
+function getRequests(staff,days){
 
-function clearRequests() {
+    return staff.map((s,i)=>{
 
-    const selects =
-        document.querySelectorAll(
-            '#requestArea select'
-        );
+        const arr=[];
 
-    selects.forEach(select => {
-        select.value = "";
+        for(let d=1;d<=days;d++){
+
+            const el=
+                document.getElementById(`req_${i}_${d}`);
+
+            arr.push(el?el.value:"");
+        }
+
+        return arr;
     });
 }
 
 
-/* =========================
-   スタッフ情報取得
-========================= */
+/* =========================================
+   勤務パターン生成
+   ここが今回の重要な修正版
+========================================= */
 
-function getStaff() {
+function createWorkPattern(
+    days,
+    offCount,
+    requests,
+    allowFour
+){
 
-    const count =
-        Number(document.getElementById("staffCount").value);
+    const fixedOff=
+        requests.filter(
+            x=>x==="休"||x==="有休"
+        ).length;
 
-    const staff = [];
-
-    for (let i = 0; i < count; i++) {
-
-        staff.push({
-            index: i,
-
-            name:
-                document.getElementById(`name_${i}`).value
-                || `スタッフ${i+1}`,
-
-            level:
-                Number(
-                    document.getElementById(`level_${i}`).value
-                ),
-
-            off:
-                Number(
-                    document.getElementById(`off_${i}`).value
-                ),
-
-            paid:
-                Number(
-                    document.getElementById(`paid_${i}`).value
-                )
-        });
+    if(fixedOff>offCount){
+        return null;
     }
 
-    return staff;
-}
+    const remainingOff=
+        offCount-fixedOff;
 
 
-/* =========================
-   希望取得
-========================= */
+    /*
+       DPで「条件を満たす休み・勤務パターン」が
+       存在するか確認しながら作る
+    */
 
-function getRequests(staff,days) {
+    const memo=new Map();
 
-    const requests = [];
+    function key(day,offUsed,run,lastWork){
 
-    for (let i = 0; i < staff.length; i++) {
+        return [
+            day,
+            offUsed,
+            run,
+            lastWork?1:0
+        ].join(",");
+    }
 
-        const row = [];
 
-        for (let d = 1; d <= days; d++) {
+    function possible(day,offUsed,run,lastWork){
 
-            const el =
-                document.getElementById(`req_${i}_${d}`);
+        if(day===days){
 
-            row.push(el ? el.value : "");
+            return offUsed===offCount;
         }
 
-        requests.push(row);
-    }
-
-    return requests;
-}
-
-
-/* =========================
-   ランダム
-========================= */
-
-function shuffle(array) {
-
-    const a = [...array];
-
-    for (let i = a.length - 1; i > 0; i--) {
-
-        const j =
-            Math.floor(Math.random() * (i + 1));
-
-        [a[i],a[j]] =
-            [a[j],a[i]];
-    }
-
-    return a;
-}
-
-
-/* =========================
-   シフト生成
-========================= */
-
-function generateSchedule() {
-
-    const days =
-        getDaysInMonth();
-
-    const staff =
-        getStaff();
-
-    const needHA =
-        Number(document.getElementById("needHA").value);
-
-    const needHP =
-        Number(document.getElementById("needHP").value);
-
-    const maxConsecutive =
-        Number(
-            document.getElementById("maxConsecutive").value
+        const k=key(
+            day,
+            offUsed,
+            run,
+            lastWork
         );
 
-    if (staff.length < needHA + needHP) {
-
-        showError(
-            `スタッフ人数が足りません。<br>
-            HA ${needHA}人 + HP ${needHP}人 = ${needHA + needHP}人が、
-            最低でも必要です。`
-        );
-
-        return;
-    }
+        if(memo.has(k)){
+            return memo.get(k);
+        }
 
 
-    const requests =
-        getRequests(staff,days);
+        const req=requests[day];
+
+        /*
+           固定休
+        */
+
+        if(req==="休"||req==="有休"){
+
+            const ok=
+                possible(
+                    day+1,
+                    offUsed+1,
+                    0,
+                    false
+                );
+
+            memo.set(k,ok);
+
+            return ok;
+        }
 
 
-    /* 希望休・有休の確認 */
+        /*
+           休みにする
+        */
 
-    for (let i = 0; i < staff.length; i++) {
+        if(offUsed<offCount){
 
-        let paidCount = 0;
+            if(
+                possible(
+                    day+1,
+                    offUsed+1,
+                    0,
+                    false
+                )
+            ){
 
-        for (let d = 0; d < days; d++) {
-
-            if (requests[i][d] === "有休") {
-                paidCount++;
+                memo.set(k,true);
+                return true;
             }
         }
 
-        if (paidCount > staff[i].paid) {
 
-            showError(
-                `${staff[i].name}さんの有休指定が${paidCount}日ありますが、` +
-                `設定されている有休日数は${staff[i].paid}日です。`
-            );
+        /*
+           勤務
+        */
 
-            return;
+        const maxRun=
+            allowFour ? 4 : 3;
+
+        if(run<maxRun){
+
+            /*
+               1連勤だけになる可能性を避ける。
+               次の日が休みになるなら、
+               今まで勤務していなければ禁止。
+            */
+
+            if(lastWork){
+
+                if(
+                    possible(
+                        day+1,
+                        offUsed,
+                        run+1,
+                        true
+                    )
+                ){
+
+                    memo.set(k,true);
+                    return true;
+                }
+
+            }else{
+
+                /*
+                   初日の勤務、または休み明け勤務。
+                   次の日も勤務できることを確認。
+                */
+
+                if(day+1<days){
+
+                    const nextReq=requests[day+1];
+
+                    const nextIsFixedOff=
+                        nextReq==="休"||
+                        nextReq==="有休";
+
+                    if(!nextIsFixedOff){
+
+                        if(
+                            possible(
+                                day+1,
+                                offUsed,
+                                1,
+                                true
+                            )
+                        ){
+
+                            memo.set(k,true);
+                            return true;
+                        }
+                    }
+                }
+            }
         }
+
+        memo.set(k,false);
+
+        return false;
+    }
+
+
+    if(!possible(0,0,0,false)){
+        return null;
     }
 
 
     /*
-       何度もランダム生成して、
-       条件を満たすシフトを探す
+       実際のパターンを作る
     */
 
-    let best = null;
+    const pattern=[];
 
-    for (let attempt = 0; attempt < 2500; attempt++) {
+    let day=0;
+    let offUsed=0;
+    let run=0;
+    let lastWork=false;
 
-        const schedule =
-            tryGenerate(
-                staff,
-                requests,
-                days,
-                needHA,
-                needHP,
-                maxConsecutive
-            );
+    while(day<days){
 
-        if (!schedule) continue;
-
-        const score =
-            evaluateSchedule(
-                schedule,
-                staff,
-                requests,
-                days,
-                needHA,
-                needHP
-            );
-
-        if (!best || score < best.score) {
-
-            best = {
-                schedule,
-                score
-            };
-        }
+        const req=requests[day];
 
         /*
-           十分良い結果なら終了
+           固定休
         */
 
-        if (score <= 10) {
-            break;
+        if(req==="休"||req==="有休"){
+
+            pattern.push("OFF");
+
+            offUsed++;
+            run=0;
+            lastWork=false;
+            day++;
+
+            continue;
         }
+
+
+        const choices=[];
+
+
+        /*
+           休み候補
+        */
+
+        if(offUsed<offCount){
+
+            if(
+                possible(
+                    day+1,
+                    offUsed+1,
+                    0,
+                    false
+                )
+            ){
+
+                choices.push("OFF");
+            }
+        }
+
+
+        /*
+           勤務候補
+        */
+
+        const maxRun=allowFour?4:3;
+
+        if(run<maxRun){
+
+            if(lastWork){
+
+                if(
+                    possible(
+                        day+1,
+                        offUsed,
+                        run+1,
+                        true
+                    )
+                ){
+
+                    choices.push("WORK");
+                }
+
+            }else if(day+1<days){
+
+                const nextReq=requests[day+1];
+
+                if(
+                    nextReq!=="休" &&
+                    nextReq!=="有休" &&
+                    possible(
+                        day+1,
+                        offUsed,
+                        1,
+                        true
+                    )
+                ){
+
+                    choices.push("WORK");
+                }
+            }
+        }
+
+
+        if(choices.length===0){
+            return null;
+        }
+
+
+        /*
+           ランダムではなく、
+           なるべく勤務ブロックを2〜3日にする
+        */
+
+        let choice;
+
+        if(choices.includes("WORK") && run===0){
+
+            choice="WORK";
+
+        }else{
+
+            choice=
+                choices[
+                    Math.floor(
+                        Math.random()*choices.length
+                    )
+                ];
+        }
+
+
+        if(choice==="OFF"){
+
+            pattern.push("OFF");
+
+            offUsed++;
+            run=0;
+            lastWork=false;
+
+        }else{
+
+            pattern.push("WORK");
+
+            run++;
+            lastWork=true;
+        }
+
+        day++;
     }
 
-
-    if (!best) {
-
-        showError(
-            `条件をすべて満たすシフトを作成できませんでした。<br><br>
-            ・スタッフ人数<br>
-            ・公休数<br>
-            ・有休日数<br>
-            ・希望休<br>
-            ・HA/HP必要人数<br>
-            ・連勤条件<br>
-            などを少し緩めると作成できる可能性があります。`
-        );
-
-        return;
-    }
-
-
-    currentSchedule =
-        best.schedule;
-
-    displaySchedule(
-        currentSchedule,
-        staff,
-        days,
-        needHA,
-        needHP
-    );
+    return pattern;
 }
 
 
-/* =========================
-   シフト生成本体
-========================= */
+/* =========================================
+   全員の勤務パターンを作る
+========================================= */
 
-function tryGenerate(
+function generateWorkPatterns(
+    staff,
+    requests,
+    days
+){
+
+    const patterns=[];
+
+    for(let i=0;i<staff.length;i++){
+
+        let pattern=null;
+
+        /*
+           まず3連勤以内で探す
+        */
+
+        for(let t=0;t<50;t++){
+
+            pattern=
+                createWorkPattern(
+                    days,
+                    staff[i].off,
+                    requests[i],
+                    false
+                );
+
+            if(pattern)break;
+        }
+
+
+        /*
+           希望休などで3連勤では無理なら
+           4連勤を許可
+        */
+
+        if(!pattern){
+
+            for(let t=0;t<100;t++){
+
+                pattern=
+                    createWorkPattern(
+                        days,
+                        staff[i].off,
+                        requests[i],
+                        true
+                    );
+
+                if(pattern)break;
+            }
+        }
+
+
+        if(!pattern){
+            return null;
+        }
+
+        patterns.push(pattern);
+    }
+
+    return patterns;
+}
+
+
+/* =========================================
+   勤務パターン評価
+========================================= */
+
+function evaluateWorkPatterns(
+    patterns,
+    staff,
+    days,
+    needTotal
+){
+
+    let score=0;
+
+
+    for(let d=0;d<days;d++){
+
+        let workers=0;
+        let level2=0;
+
+        for(let i=0;i<staff.length;i++){
+
+            if(patterns[i][d]==="WORK"){
+
+                workers++;
+
+                if(staff[i].level===2){
+                    level2++;
+                }
+            }
+        }
+
+
+        /*
+           必要人数不足は大きなペナルティ
+        */
+
+        if(workers<needTotal){
+
+            score+=
+                (needTotal-workers)*1000;
+        }
+
+
+        /*
+           レベル1だけの日は禁止
+        */
+
+        if(workers>0 && level2===0){
+
+            score+=10000;
+        }
+    }
+
+
+    return score;
+}
+
+
+/* =========================================
+   勤務パターンを組み合わせる
+========================================= */
+
+function findWorkPatterns(
+    staff,
+    requests,
+    days,
+    needTotal
+){
+
+    let best=null;
+    let bestScore=Infinity;
+
+
+    /*
+       何度も全員のパターンを作り直す
+    */
+
+    for(let attempt=0;attempt<3000;attempt++){
+
+        const patterns=
+            generateWorkPatterns(
+                staff,
+                requests,
+                days
+            );
+
+        if(!patterns)continue;
+
+
+        const score=
+            evaluateWorkPatterns(
+                patterns,
+                staff,
+                days,
+                needTotal
+            );
+
+
+        if(score<bestScore){
+
+            bestScore=score;
+            best=patterns;
+        }
+
+
+        if(score===0){
+
+            return patterns;
+        }
+    }
+
+
+    return best;
+}
+
+
+/* =========================================
+   シフト割当
+========================================= */
+
+function assignShifts(
+    patterns,
     staff,
     requests,
     days,
     needHA,
-    needHP,
-    maxConsecutive
-) {
+    needHP
+){
 
-    const n = staff.length;
-
-    const schedule =
+    const schedule=
         Array.from(
-            {length:n},
-            () => Array(days).fill(null)
+            {length:staff.length},
+            ()=>Array(days).fill("休")
         );
 
 
     /*
-       希望休・有休を先に固定
+       勤務・休みをセット
     */
 
-    for (let i = 0; i < n; i++) {
+    for(let i=0;i<staff.length;i++){
 
-        let fixedOff = 0;
-        let fixedPaid = 0;
+        for(let d=0;d<days;d++){
 
-        for (let d = 0; d < days; d++) {
+            if(patterns[i][d]==="WORK"){
 
-            if (requests[i][d] === "休") {
+                schedule[i][d]="WORK";
 
-                schedule[i][d] = "休";
-                fixedOff++;
-
-            } else if (requests[i][d] === "有休") {
-
-                schedule[i][d] = "有休";
-                fixedPaid++;
-            }
-        }
-
-        /*
-           希望休＋有休が公休数を超える場合
-        */
-
-        if (fixedOff > staff[i].off) {
-            return null;
-        }
-
-        if (fixedPaid > staff[i].paid) {
-            return null;
-        }
-    }
-
-
-    /*
-       公休を追加
-    */
-
-    for (let i = 0; i < n; i++) {
-
-        let currentOff = 0;
-
-        for (let d = 0; d < days; d++) {
-
-            if (
-                schedule[i][d] === "休" ||
-                schedule[i][d] === "有休"
-            ) {
-                currentOff++;
-            }
-        }
-
-        let needOff =
-            staff[i].off - currentOff;
-
-        const candidates =
-            shuffle(
-                Array.from(
-                    {length:days},
-                    (_,d) => d
-                )
-            );
-
-        for (const d of candidates) {
-
-            if (needOff <= 0) break;
-
-            if (schedule[i][d] !== null) continue;
-
-            /*
-               休みを置いた結果、
-               1勤務だけになる可能性を減らす
-            */
-
-            schedule[i][d] = "休";
-            needOff--;
-        }
-
-        if (needOff > 0) {
-            return null;
-        }
-    }
-
-
-    /*
-       残りを勤務にする
-    */
-
-    for (let i = 0; i < n; i++) {
-
-        for (let d = 0; d < days; d++) {
-
-            if (schedule[i][d] === null) {
-
-                schedule[i][d] = "WORK";
-            }
-        }
-    }
-
-
-    /*
-       連勤条件をチェック
-    */
-
-    for (let i = 0; i < n; i++) {
-
-        let consecutive = 0;
-
-        for (let d = 0; d < days; d++) {
-
-            if (schedule[i][d] === "WORK") {
-
-                consecutive++;
-
-                if (consecutive > maxConsecutive) {
-
-                    /*
-                       希望休を挟んだ場合のみ
-                       4連勤を許可
-                    */
-
-                    if (
-                        consecutive === 4 &&
-                        hasNearbyRequest(
-                            requests[i],
-                            d
-                        )
-                    ) {
-
-                        continue;
-
-                    } else {
-
-                        return null;
-                    }
-                }
-
-            } else {
-
-                consecutive = 0;
-            }
-        }
-    }
-
-
-    /*
-       1勤務だけのブロックをチェック
-    */
-
-    for (let i = 0; i < n; i++) {
-
-        for (let d = 0; d < days; d++) {
-
-            if (schedule[i][d] !== "WORK") {
-                continue;
-            }
-
-            const prev =
-                d === 0 ? false :
-                schedule[i][d-1] === "WORK";
-
-            const next =
-                d === days-1 ? false :
-                schedule[i][d+1] === "WORK";
-
-            if (!prev && !next) {
+            }else{
 
                 /*
-                   単独勤務を避ける
+                   希望有休なら有休
                 */
 
-                return null;
+                if(requests[i][d]==="有休"){
+
+                    schedule[i][d]="有休";
+
+                }else{
+
+                    schedule[i][d]="休";
+                }
             }
         }
     }
 
 
     /*
-       シフト種類を決める
+       日ごとにHA/HPを割り当てる
     */
 
-    for (let d = 0; d < days; d++) {
+    for(let d=0;d<days;d++){
 
-        const workers = [];
+        const workers=[];
 
-        for (let i = 0; i < n; i++) {
+        for(let i=0;i<staff.length;i++){
 
-            if (schedule[i][d] === "WORK") {
-
+            if(schedule[i][d]==="WORK"){
                 workers.push(i);
             }
         }
 
-        /*
-           最低必要人数
-        */
 
-        if (workers.length < needHA + needHP) {
+        if(workers.length<needHA+needHP){
             return null;
         }
 
 
-        let assigned = false;
-
         /*
-           何度か割り当てを試す
+           HP→HA禁止を考慮して候補を作る
         */
 
-        for (let attempt = 0; attempt < 100; attempt++) {
+        const validHA=
+            workers.filter(i=>{
 
-            const temp =
-                workers.map(i => {
+                if(d===0)return true;
 
-                    const previous =
-                        d > 0
-                            ? schedule[i][d-1]
-                            : null;
-
-                    /*
-                       前日HPならHA禁止
-                    */
-
-                    if (previous === "HP") {
-
-                        return {
-                            i,
-                            preferred: "HP"
-                        };
-                    }
-
-                    /*
-                       前日HAならHA継続を優先
-                    */
-
-                    if (previous === "HA") {
-
-                        return {
-                            i,
-                            preferred: "HA"
-                        };
-                    }
-
-                    return {
-                        i,
-                        preferred:
-                            Math.random() < 0.5
-                            ? "HA"
-                            : "HP"
-                    };
-                });
+                return schedule[i][d-1]!=="HP";
+            });
 
 
-            /*
-               希望勤務を反映
-            */
-
-            for (const item of temp) {
-
-                const req =
-                    requests[item.i][d];
-
-                if (req === "HA") {
-                    item.preferred = "HA";
-                }
-
-                if (req === "HP") {
-                    item.preferred = "HP";
-                }
-            }
-
-
-            let ha =
-                temp.filter(
-                    x => x.preferred === "HA"
-                );
-
-            let hp =
-                temp.filter(
-                    x => x.preferred === "HP"
-                );
-
-
-            /*
-               HA人数を確保
-            */
-
-            while (ha.length < needHA) {
-
-                const candidate =
-                    temp.find(
-                        x =>
-                        !ha.includes(x) &&
-                        !(d > 0 &&
-                          schedule[x.i][d-1] === "HP")
-                    );
-
-                if (!candidate) break;
-
-                candidate.preferred = "HA";
-                ha.push(candidate);
-            }
-
-
-            /*
-               HP人数を確保
-            */
-
-            while (hp.length < needHP) {
-
-                const candidate =
-                    temp.find(
-                        x =>
-                        !hp.includes(x)
-                    );
-
-                if (!candidate) break;
-
-                candidate.preferred = "HP";
-                hp.push(candidate);
-            }
-
-
-            /*
-               HP→HAを再確認
-            */
-
-            let valid = true;
-
-            for (const item of temp) {
-
-                if (
-                    d > 0 &&
-                    schedule[item.i][d-1] === "HP" &&
-                    item.preferred === "HA"
-                ) {
-
-                    valid = false;
-                }
-            }
-
-            if (!valid) continue;
-
-
-            /*
-               レベル1だけの日を禁止
-            */
-
-            const traineeWorking =
-                workers.some(
-                    i => staff[i].level === 1
-                );
-
-            const trainerWorking =
-                workers.some(
-                    i => staff[i].level === 2
-                );
-
-            if (
-                traineeWorking &&
-                !trainerWorking
-            ) {
-
-                continue;
-            }
-
-
-            /*
-               確定
-            */
-
-            for (const item of temp) {
-
-                schedule[item.i][d] =
-                    item.preferred;
-            }
-
-            assigned = true;
-            break;
-        }
-
-        if (!assigned) {
+        if(validHA.length<needHA){
             return null;
         }
-    }
 
 
-    /*
-       最終チェック
-    */
+        /*
+           前日の勤務をなるべく継続
+        */
 
-    if (
-        !validateSchedule(
-            schedule,
-            staff,
-            requests,
-            days,
-            needHA,
-            needHP,
-            maxConsecutive
-        )
-    ) {
-        return null;
+        let ordered=
+            workers.slice().sort((a,b)=>{
+
+                const pa=
+                    d>0 ? schedule[a][d-1] : "";
+
+                const pb=
+                    d>0 ? schedule[b][d-1] : "";
+
+                /*
+                   HP継続を優先
+                */
+
+                if(pa==="HP" && pb!=="HP")return -1;
+                if(pb==="HP" && pa!=="HP")return 1;
+
+                /*
+                   希望を優先
+                */
+
+                const ra=requests[a][d];
+                const rb=requests[b][d];
+
+                if(ra==="HA" && rb!=="HA")return -1;
+                if(rb==="HA" && ra!=="HA")return 1;
+
+                return Math.random()-.5;
+            });
+
+
+        /*
+           まずHAを決める
+        */
+
+        const ha=[];
+
+        for(const i of ordered){
+
+            if(ha.length>=needHA)break;
+
+            if(validHA.includes(i)){
+
+                /*
+                   HP希望なら後回し
+                */
+
+                if(requests[i][d]==="HP"){
+                    continue;
+                }
+
+                ha.push(i);
+            }
+        }
+
+
+        /*
+           足りなければ追加
+        */
+
+        if(ha.length<needHA){
+
+            for(const i of validHA){
+
+                if(ha.includes(i))continue;
+
+                ha.push(i);
+
+                if(ha.length>=needHA)break;
+            }
+        }
+
+
+        if(ha.length<needHA){
+            return null;
+        }
+
+
+        /*
+           残りからHP
+        */
+
+        const remaining=
+            workers.filter(
+                i=>!ha.includes(i)
+            );
+
+
+        if(remaining.length<needHP){
+            return null;
+        }
+
+
+        /*
+           HP希望を優先
+        */
+
+        remaining.sort((a,b)=>{
+
+            const ra=requests[a][d];
+            const rb=requests[b][d];
+
+            if(ra==="HP" && rb!=="HP")return -1;
+            if(rb==="HP" && ra!=="HP")return 1;
+
+            return Math.random()-.5;
+        });
+
+
+        const hp=
+            remaining.slice(0,needHP);
+
+
+        if(hp.length<needHP){
+            return null;
+        }
+
+
+        /*
+           決定
+        */
+
+        for(const i of workers){
+
+            if(ha.includes(i)){
+
+                schedule[i][d]="HA";
+
+            }else if(hp.includes(i)){
+
+                schedule[i][d]="HP";
+
+            }else{
+
+                /*
+                   必要人数以上の勤務者がいる場合は
+                   余剰勤務としてHA/HPのどちらかにする
+                   必要人数だけを基本とする
+                */
+
+                schedule[i][d]="休";
+            }
+        }
+
+
+        /*
+           レベル1勤務時はレベル2がいるか
+        */
+
+        const working=
+            workers.filter(
+                i=>
+                    schedule[i][d]==="HA"||
+                    schedule[i][d]==="HP"
+            );
+
+
+        const hasLv1=
+            working.some(
+                i=>staff[i].level===1
+            );
+
+        const hasLv2=
+            working.some(
+                i=>staff[i].level===2
+            );
+
+        if(hasLv1&&!hasLv2){
+            return null;
+        }
     }
 
 
@@ -1264,33 +1314,9 @@ function tryGenerate(
 }
 
 
-/* =========================
-   希望休付近か
-========================= */
-
-function hasNearbyRequest(requests,d) {
-
-    for (
-        let x = Math.max(0,d-2);
-        x <= Math.min(requests.length-1,d+2);
-        x++
-    ) {
-
-        if (
-            requests[x] === "休" ||
-            requests[x] === "有休"
-        ) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-
-/* =========================
+/* =========================================
    最終チェック
-========================= */
+========================================= */
 
 function validateSchedule(
     schedule,
@@ -1298,118 +1324,96 @@ function validateSchedule(
     requests,
     days,
     needHA,
-    needHP,
-    maxConsecutive
-) {
+    needHP
+){
 
-    const n = staff.length;
+    for(let d=0;d<days;d++){
 
+        let ha=0;
+        let hp=0;
 
-    for (let d = 0; d < days; d++) {
+        let lv1=false;
+        let lv2=false;
 
-        let ha = 0;
-        let hp = 0;
-        let level2 = false;
-        let level1 = false;
+        for(let i=0;i<staff.length;i++){
 
-        for (let i = 0; i < n; i++) {
-
-            const shift =
-                schedule[i][d];
-
-            if (shift === "HA") ha++;
-
-            if (shift === "HP") hp++;
-
-            if (
-                shift === "HA" ||
-                shift === "HP"
-            ) {
-
-                if (staff[i].level === 1) {
-                    level1 = true;
-                }
-
-                if (staff[i].level === 2) {
-                    level2 = true;
-                }
-            }
+            const s=schedule[i][d];
 
 
             /*
-               希望休・有休を守る
+               希望
             */
 
-            if (
-                requests[i][d] === "休" &&
-                shift !== "休"
-            ) {
+            if(
+                requests[i][d]==="休" &&
+                s!=="休"
+            ){
                 return false;
             }
 
-            if (
-                requests[i][d] === "有休" &&
-                shift !== "有休"
-            ) {
+            if(
+                requests[i][d]==="有休" &&
+                s!=="有休"
+            ){
                 return false;
             }
 
 
+            if(s==="HA")ha++;
+            if(s==="HP")hp++;
+
+
+            if(s==="HA"||s==="HP"){
+
+                if(staff[i].level===1)lv1=true;
+                if(staff[i].level===2)lv2=true;
+            }
+
+
             /*
-               HP→HA禁止
+               HP→HA
             */
 
-            if (
-                d > 0 &&
-                schedule[i][d-1] === "HP" &&
-                shift === "HA"
-            ) {
-
+            if(
+                d>0 &&
+                schedule[i][d-1]==="HP" &&
+                s==="HA"
+            ){
                 return false;
             }
         }
 
 
-        if (ha < needHA) return false;
-        if (hp < needHP) return false;
+        if(ha<needHA)return false;
+        if(hp<needHP)return false;
 
-
-        /*
-           レベル1が勤務するなら
-           レベル2も勤務
-        */
-
-        if (level1 && !level2) {
-            return false;
-        }
+        if(lv1&&!lv2)return false;
     }
 
 
     /*
-       連勤チェック
+       連勤
     */
 
-    for (let i = 0; i < n; i++) {
+    for(let i=0;i<staff.length;i++){
 
-        let consecutive = 0;
+        let run=0;
 
-        for (let d = 0; d < days; d++) {
+        for(let d=0;d<days;d++){
 
-            const working =
-                schedule[i][d] === "HA" ||
-                schedule[i][d] === "HP";
+            const working=
+                schedule[i][d]==="HA"||
+                schedule[i][d]==="HP";
 
-            if (working) {
+            if(working){
 
-                consecutive++;
+                run++;
 
-                if (consecutive > 4) {
-                    return false;
-                }
+                if(run>4)return false;
 
-            } else {
+            }else{
 
-                consecutive = 0;
+                run=0;
             }
         }
     }
@@ -1419,31 +1423,31 @@ function validateSchedule(
        1連勤禁止
     */
 
-    for (let i = 0; i < n; i++) {
+    for(let i=0;i<staff.length;i++){
 
-        for (let d = 0; d < days; d++) {
+        for(let d=0;d<days;d++){
 
-            const working =
-                schedule[i][d] === "HA" ||
-                schedule[i][d] === "HP";
+            const working=
+                schedule[i][d]==="HA"||
+                schedule[i][d]==="HP";
 
-            if (!working) continue;
+            if(!working)continue;
 
-            const prev =
-                d > 0 &&
+            const prev=
+                d>0 &&
                 (
-                    schedule[i][d-1] === "HA" ||
-                    schedule[i][d-1] === "HP"
+                    schedule[i][d-1]==="HA"||
+                    schedule[i][d-1]==="HP"
                 );
 
-            const next =
-                d < days-1 &&
+            const next=
+                d<days-1 &&
                 (
-                    schedule[i][d+1] === "HA" ||
-                    schedule[i][d+1] === "HP"
+                    schedule[i][d+1]==="HA"||
+                    schedule[i][d+1]==="HP"
                 );
 
-            if (!prev && !next) {
+            if(!prev&&!next){
                 return false;
             }
         }
@@ -1451,270 +1455,307 @@ function validateSchedule(
 
 
     /*
-       同じ勤務の1日だけ勤務を禁止
+       HA/HPの単独1日をできるだけ防ぐ
     */
 
-    for (let i = 0; i < n; i++) {
+    for(let i=0;i<staff.length;i++){
 
-        for (let d = 0; d < days; d++) {
+        for(let d=0;d<days;d++){
 
-            const current =
-                schedule[i][d];
+            const s=schedule[i][d];
 
-            if (
-                current !== "HA" &&
-                current !== "HP"
-            ) continue;
+            if(s!=="HA"&&s!=="HP")continue;
 
-            const previous =
-                d > 0
-                    ? schedule[i][d-1]
-                    : null;
 
-            const next =
-                d < days-1
-                    ? schedule[i][d+1]
-                    : null;
+            const prev=
+                d>0?schedule[i][d-1]:null;
+
+            const next=
+                d<days-1?schedule[i][d+1]:null;
+
 
             /*
-               HA/HPが切り替わる場合も
-               極端な飛び方を避ける
+               勤務→別勤務→勤務は許可
+               ただしHP→HAだけは禁止済み
             */
 
-            if (
-                previous &&
-                previous !== "休" &&
-                previous !== "有休" &&
-                previous !== current
-            ) {
+            if(
+                prev==="休" &&
+                next==="休"
+            ){
+                return false;
+            }
 
-                if (
-                    current === "HA" &&
-                    previous === "HP"
-                ) {
-                    return false;
-                }
+            if(
+                prev==="有休" &&
+                next==="休"
+            ){
+                return false;
             }
         }
     }
+
 
     return true;
 }
 
 
-/* =========================
-   評価
-========================= */
+/* =========================================
+   シフト生成
+========================================= */
 
-function evaluateSchedule(
-    schedule,
-    staff,
-    requests,
-    days,
-    needHA,
-    needHP
-) {
+function generateSchedule(){
 
-    let score = 0;
+    const staff=getStaff();
 
-    const hpCount =
-        Array(staff.length).fill(0);
+    const days=getDays();
 
-    const haCount =
-        Array(staff.length).fill(0);
+    const needHA=
+        Number(document.getElementById("needHA").value);
+
+    const needHP=
+        Number(document.getElementById("needHP").value);
 
 
     /*
-       希望勤務
+       必要人数
     */
 
-    for (let i = 0; i < staff.length; i++) {
+    const required=
+        needHA+needHP;
 
-        for (let d = 0; d < days; d++) {
 
-            const req =
-                requests[i][d];
+    if(staff.length<required){
 
-            const shift =
-                schedule[i][d];
+        showError(
+            `現在の設定では最低${required}人必要です。<br>
+            HA ${needHA}人 + HP ${needHP}人です。`
+        );
 
-            if (
-                (req === "HA" && shift !== "HA") ||
-                (req === "HP" && shift !== "HP")
-            ) {
+        return;
+    }
 
-                score += 2;
+
+    const requests=
+        getRequests(staff,days);
+
+
+    /*
+       有休チェック
+    */
+
+    for(let i=0;i<staff.length;i++){
+
+        let count=0;
+
+        for(let d=0;d<days;d++){
+
+            if(requests[i][d]==="有休"){
+                count++;
             }
+        }
 
-            if (shift === "HA") {
-                haCount[i]++;
-            }
+        if(count>staff[i].paid){
 
-            if (shift === "HP") {
-                hpCount[i]++;
-            }
+            showError(
+                `${staff[i].name}さんの有休指定が${count}日あります。<br>
+                設定された有休日数は${staff[i].paid}日です。`
+            );
+
+            return;
         }
     }
 
 
     /*
-       HPを均等化
+       公休＋有休が月の日数を超えないか
     */
 
-    const workingStaff =
-        staff.map((s,i) => hpCount[i]);
+    for(let i=0;i<staff.length;i++){
 
-    const average =
-        workingStaff.reduce(
-            (a,b) => a+b,0
-        ) / Math.max(1,staff.length);
+        if(staff[i].off+staff[i].paid>days){
 
-    for (let i = 0; i < staff.length; i++) {
+            showError(
+                `${staff[i].name}さんの公休＋有休が${days}日を超えています。`
+            );
 
-        score +=
-            Math.abs(
-                hpCount[i] - average
-            ) * 0.3;
+            return;
+        }
     }
 
 
     /*
-       勤務日数の偏りを軽減
+       勤務パターンを探す
     */
 
-    const totalWork =
-        staff.map((s,i) => {
+    let best=null;
 
-            let count = 0;
 
-            for (let d = 0; d < days; d++) {
+    for(let attempt=0;attempt<30;attempt++){
 
-                if (
-                    schedule[i][d] === "HA" ||
-                    schedule[i][d] === "HP"
-                ) {
-                    count++;
-                }
+        const patterns=
+            findWorkPatterns(
+                staff,
+                requests,
+                days,
+                required
+            );
+
+        if(!patterns)continue;
+
+
+        /*
+           シフトを何パターンか試す
+        */
+
+        for(let t=0;t<100;t++){
+
+            const shuffledPatterns=
+                patterns.map(p=>p.slice());
+
+
+            const schedule=
+                assignShifts(
+                    shuffledPatterns,
+                    staff,
+                    requests,
+                    days,
+                    needHA,
+                    needHP
+                );
+
+
+            if(!schedule)continue;
+
+
+            if(
+                validateSchedule(
+                    schedule,
+                    staff,
+                    requests,
+                    days,
+                    needHA,
+                    needHP
+                )
+            ){
+
+                best=schedule;
+                break;
             }
+        }
 
-            return count;
-        });
 
-    const avgWork =
-        totalWork.reduce(
-            (a,b) => a+b,0
-        ) / Math.max(1,totalWork.length);
-
-    for (const x of totalWork) {
-
-        score +=
-            Math.abs(x - avgWork) * 0.15;
+        if(best)break;
     }
 
 
-    return score;
+    if(!best){
+
+        showError(
+            `条件を満たすシフトを作成できませんでした。<br><br>
+            現在の条件が非常に厳しい可能性があります。<br>
+            特に「公休数」「希望休」「HA/HP必要人数」の組み合わせを確認してください。`
+        );
+
+        return;
+    }
+
+
+    displaySchedule(
+        best,
+        staff,
+        days
+    );
 }
 
 
-/* =========================
+/* =========================================
    結果表示
-========================= */
+========================================= */
 
 function displaySchedule(
     schedule,
     staff,
-    days,
-    needHA,
-    needHP
-) {
+    days
+){
 
-    let html = `
+    let html=`
     <div class="success">
-        シフトを作成しました！
+    ✅ シフトを作成しました！
     </div>
 
     <div class="legend">
-        <span class="legend-ha">HA</span>
-        <span class="legend-hp">HP</span>
-        <span class="legend-off">休</span>
-        <span class="legend-paid">有休</span>
+    <span class="lha">HA</span>
+    <span class="lhp">HP</span>
+    <span class="loff">休</span>
+    <span class="lpaid">有休</span>
     </div>
 
-    <div class="result-wrapper">
+    <div class="scroll">
 
     <table>
 
     <tr>
-        <th>名前</th>
+    <th>名前</th>
     `;
 
-    for (let d = 1; d <= days; d++) {
-
-        html += `<th>${d}</th>`;
+    for(let d=1;d<=days;d++){
+        html+=`<th>${d}</th>`;
     }
 
-    html += `
-        <th>HA</th>
-        <th>HP</th>
-    </tr>
-    `;
+    html+=`
+    <th>HA</th>
+    <th>HP</th>
+    </tr>`;
 
 
-    for (let i = 0; i < staff.length; i++) {
+    for(let i=0;i<staff.length;i++){
 
-        let haCount = 0;
-        let hpCount = 0;
+        let ha=0;
+        let hp=0;
 
-        html += `
+        html+=`
         <tr>
-            <th>
-                ${escapeHtml(staff[i].name)}
-                <br>
-                <small>
-                    Lv.${staff[i].level}
-                </small>
-            </th>
-        `;
+        <th>
+        ${escapeHtml(staff[i].name)}
+        <br>
+        <small>Lv.${staff[i].level}</small>
+        </th>`;
 
+        for(let d=0;d<days;d++){
 
-        for (let d = 0; d < days; d++) {
+            const s=schedule[i][d];
 
-            const shift =
-                schedule[i][d];
+            let cls="";
 
-            let cls = "";
-
-            if (shift === "HA") {
-                cls = "shift-HA";
-                haCount++;
+            if(s==="HA"){
+                cls="shift-HA";
+                ha++;
             }
 
-            if (shift === "HP") {
-                cls = "shift-HP";
-                hpCount++;
+            if(s==="HP"){
+                cls="shift-HP";
+                hp++;
             }
 
-            if (shift === "休") {
-                cls = "shift-off";
+            if(s==="休"){
+                cls="shift-off";
             }
 
-            if (shift === "有休") {
-                cls = "shift-paid";
+            if(s==="有休"){
+                cls="shift-paid";
             }
 
-            html += `
+            html+=`
             <td class="${cls}">
-                ${shift}
-            </td>
-            `;
+            ${s}
+            </td>`;
         }
 
-
-        html += `
-            <td>${haCount}</td>
-            <td>${hpCount}</td>
-        </tr>
-        `;
+        html+=`
+        <td>${ha}</td>
+        <td>${hp}</td>
+        </tr>`;
     }
 
 
@@ -1722,172 +1763,79 @@ function displaySchedule(
        日別人数
     */
 
-    html += `
+    html+=`
     <tr>
-        <th>HA人数</th>
-    `;
+    <th>HA人数</th>`;
 
-    for (let d = 0; d < days; d++) {
+    for(let d=0;d<days;d++){
 
-        let count = 0;
+        let c=0;
 
-        for (let i = 0; i < staff.length; i++) {
+        for(let i=0;i<staff.length;i++){
 
-            if (schedule[i][d] === "HA") {
-                count++;
-            }
+            if(schedule[i][d]==="HA")c++;
         }
 
-        html += `<td>${count}</td>`;
+        html+=`<td>${c}</td>`;
     }
 
-    html += `<td colspan="2"></td></tr>`;
+    html+=`
+    <td colspan="2"></td>
+    </tr>`;
 
 
-    html += `
+    html+=`
     <tr>
-        <th>HP人数</th>
-    `;
+    <th>HP人数</th>`;
 
-    for (let d = 0; d < days; d++) {
+    for(let d=0;d<days;d++){
 
-        let count = 0;
+        let c=0;
 
-        for (let i = 0; i < staff.length; i++) {
+        for(let i=0;i<staff.length;i++){
 
-            if (schedule[i][d] === "HP") {
-                count++;
-            }
+            if(schedule[i][d]==="HP")c++;
         }
 
-        html += `<td>${count}</td>`;
+        html+=`<td>${c}</td>`;
     }
 
-    html += `<td colspan="2"></td></tr>`;
-
-
-    html += `
+    html+=`
+    <td colspan="2"></td>
+    </tr>
     </table>
     </div>
     `;
 
 
-    /*
-       保存ボタン
-    */
-
-    html += `
-    <button
-        class="secondary"
-        onclick="saveSchedule()"
-    >
-        このシフトを保存
-    </button>
-
-    <button
-        class="secondary"
-        onclick="copyScheduleText()"
-    >
-        シフトをコピー
-    </button>
-    `;
-
-
-    document.getElementById("result").innerHTML =
-        html;
+    document.getElementById("result").innerHTML=html;
 }
 
 
-/* =========================
-   シフト保存
-========================= */
+/* =========================================
+   その他
+========================================= */
 
-function saveSchedule() {
+function clearRequests(){
 
-    if (!currentSchedule) return;
-
-    localStorage.setItem(
-        "shiftSchedule",
-        JSON.stringify(currentSchedule)
-    );
-
-    alert("シフトを保存しました！");
+    document
+    .querySelectorAll("#requestArea select")
+    .forEach(x=>x.value="");
 }
 
 
-/* =========================
-   コピー
-========================= */
+function showError(message){
 
-function copyScheduleText() {
-
-    if (!currentSchedule) return;
-
-    const staff =
-        getStaff();
-
-    const days =
-        getDaysInMonth();
-
-    let text = "";
-
-    text += "シフト表\n\n";
-
-    text += "名前\t";
-
-    for (let d = 1; d <= days; d++) {
-
-        text += d + "\t";
-    }
-
-    text += "\n";
-
-
-    for (let i = 0; i < staff.length; i++) {
-
-        text += staff[i].name + "\t";
-
-        for (let d = 0; d < days; d++) {
-
-            text +=
-                currentSchedule[i][d] + "\t";
-        }
-
-        text += "\n";
-    }
-
-
-    navigator.clipboard.writeText(text)
-        .then(() => {
-            alert("シフトをコピーしました！");
-        })
-        .catch(() => {
-            alert("コピーできませんでした。");
-        });
+    document.getElementById("result").innerHTML=`
+    <div class="error">
+    <strong>⚠️ シフトを作成できません</strong>
+    <br><br>
+    ${message}
+    </div>`;
 }
 
 
-/* =========================
-   エラー表示
-========================= */
-
-function showError(message) {
-
-    document.getElementById("result").innerHTML = `
-        <div class="error">
-            <strong>⚠️ シフトを作成できません</strong>
-            <br><br>
-            ${message}
-        </div>
-    `;
-}
-
-
-/* =========================
-   HTMLエスケープ
-========================= */
-
-function escapeHtml(text) {
+function escapeHtml(text){
 
     return String(text)
         .replace(/&/g,"&amp;")
@@ -1898,9 +1846,9 @@ function escapeHtml(text) {
 }
 
 
-/* =========================
+/* =========================================
    初期化
-========================= */
+========================================= */
 
 setDefaultMonth();
 buildStaffSettings();
